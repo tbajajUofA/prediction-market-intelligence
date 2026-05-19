@@ -65,6 +65,24 @@ button {
   border-right: 1px solid var(--line);
 }
 
+/* Dark track with blue thumb scrollbars for sidebar and table wrappers */
+.sidebar, .table-wrap {
+  scrollbar-color: #1e3a8a #050505; /* thumb, track for Firefox */
+}
+
+.sidebar::-webkit-scrollbar, .table-wrap::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.sidebar::-webkit-scrollbar-track, .table-wrap::-webkit-scrollbar-track {
+  background: #050505;
+}
+.sidebar::-webkit-scrollbar-thumb, .table-wrap::-webkit-scrollbar-thumb {
+  background: #1e3a8a;
+  border-radius: 8px;
+  border: 2px solid rgba(0,0,0,0);
+}
+
 .shell.collapsed .sidebar {
   width: 0 !important;
   padding: 0 !important;

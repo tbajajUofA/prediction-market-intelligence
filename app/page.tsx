@@ -55,6 +55,7 @@ export default function Home() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [markets, setMarkets] = useState<MarketResult[]>([]);
   const [selectedConditionId, setSelectedConditionId] = useState("");
+  const [upDownBtcOnly, setUpDownBtcOnly] = useState(false);
 
   // Trade-flow data returned from /api/trades.
   const [trades, setTrades] = useState<TradeRow[]>([]);
@@ -143,6 +144,30 @@ export default function Home() {
   // This client-side read is intentionally simple until wallet history exists.
   const shadow = useMemo(() => buildShadowSignal(wallets, summary), [summary, wallets]);
 
+  // Filter for crypto up/down markets (active only when the flag is set).
+  const visibleMarkets = useMemo(() => {
+    if (!upDownBtcOnly) return markets;
+    return markets.filter((m) => {
+      if (!m) return false;
+      if (!m.active) return false; // only currently active
+      const text = `${m.title} ${m.question} ${m.slug ?? ""}`.toLowerCase();
+      const isBtc = /\b(btc|bitcoin)\b/.test(text);
+      const outcomes = (m.outcomes ?? []).map((o) => String(o).toLowerCase());
+      const isUpDown = outcomes.includes("up") && outcomes.includes("down");
+      const slugMatches = (m.slug ?? "").toLowerCase().includes("-updown-");
+      return isBtc && (isUpDown || slugMatches);
+    });
+  }, [markets, upDownBtcOnly]);
+
+  // Convert MST time to EST by adding two hours and formatting for display.
+  function mstToESTDisplay(iso: string | null | undefined): string | null {
+    if (!iso) return null;
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return null;
+    const est = new Date(d.getTime() + 2 * 60 * 60 * 1000);
+    return est.toLocaleString("en-US", { month: "short", day: "numeric", hour: "2-digit", minute: "2-digit", second: "2-digit" });
+  }
+
   return (
     <main className={`shell ${sidebarOpen ? "" : "collapsed"}`}>
       <button
@@ -162,10 +187,17 @@ export default function Home() {
         <label className="field">
           <span>Market search</span>
           <input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="bitcoin, election, fed..." />
-        </label>
-
-        <label className="check">
-          <input type="checkbox" checked={activeOnly} onChange={(event) => setActiveOnly(event.target.checked)} />
+            <label>
+              <input type="checkbox" checked={autoRefresh} onChange={(e) => setAutoRefresh(e.target.checked)} />
+              Auto refresh trades
+            </label>
+            <label style={{ display: 'block', marginTop: 8 }}>
+              <input type="checkbox" checked={upDownBtcOnly} onChange={(e) => setUpDownBtcOnly(e.target.checked)} />
+              Up/Down markets (BTC only, active only)
+            </label>
+            <p className="muted" style={{ marginTop: 6 }}>
+              Times shown in EST (MST → EST = +2h)
+            </p>
           <span>Active markets only</span>
         </label>
 
@@ -185,7 +217,7 @@ export default function Home() {
         {marketError ? <p className="error">{marketError}</p> : null}
 
         <div className="market-list">
-          {markets.map((market) => (
+            {visibleMarkets.map((market) => (
             <button
               className={market.conditionId === selectedMarket?.conditionId ? "market-item active" : "market-item"}
               key={market.conditionId}
@@ -209,6 +241,9 @@ export default function Home() {
                 <p className="eyebrow">Selected market</p>
                 <h2>{selectedMarket.title}</h2>
                 <p className="muted">{selectedMarket.question}</p>
+                {selectedMarket.endDate ? (
+                  <p className="muted">End (EST): {mstToESTDisplay(selectedMarket.endDate)}</p>
+                ) : null}
               </div>
               {selectedMarket.url ? (
                 <a className="external" href={selectedMarket.url} target="_blank" rel="noreferrer">
