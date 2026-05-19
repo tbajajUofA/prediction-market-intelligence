@@ -14,7 +14,16 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const query = searchParams.get("q") ?? "bitcoin";
   const limit = clamp(Number(searchParams.get("limit") ?? 20), 5, 50);
-  const activeOnly = searchParams.get("activeOnly") !== "false";
+  const explicitActive = searchParams.get("activeOnly");
+  const looksLikeId = (q: string) => {
+    const low = q.toLowerCase().trim();
+    return /-\d+m-\d+/.test(low) || low.includes("-5m-") || /\b\d+m\b/.test(low);
+  };
+  let activeOnly = explicitActive !== "false";
+  if (looksLikeId(query)) {
+    // When the user searches for a specific condition id or timeframe slug, include closed markets too.
+    activeOnly = false;
+  }
 
   try {
     // Delegate all external API work and normalization to lib/polymarket.ts.
