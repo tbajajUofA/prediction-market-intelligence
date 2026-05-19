@@ -52,6 +52,7 @@ export default function Home() {
   // Sidebar/search state.
   const [query, setQuery] = useState("bitcoin");
   const [activeOnly, setActiveOnly] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [markets, setMarkets] = useState<MarketResult[]>([]);
   const [selectedConditionId, setSelectedConditionId] = useState("");
 
@@ -143,7 +144,15 @@ export default function Home() {
   const shadow = useMemo(() => buildShadowSignal(wallets, summary), [summary, wallets]);
 
   return (
-    <main className="shell">
+    <main className={`shell ${sidebarOpen ? "" : "collapsed"}`}>
+      <button
+        className="menu-toggle"
+        aria-label={sidebarOpen ? "Hide sidebar" : "Show sidebar"}
+        aria-expanded={sidebarOpen}
+        onClick={() => setSidebarOpen((s) => !s)}
+      >
+        ☰
+      </button>
       <aside className="sidebar">
         <div>
           <p className="eyebrow">Polymarket</p>
@@ -183,7 +192,10 @@ export default function Home() {
               onClick={() => setSelectedConditionId(market.conditionId)}
             >
               <span>{market.title}</span>
-              <small>{formatMoney(market.volume)} volume</small>
+              <small>
+                <span className="num">{formatMoney(market.volume)}</span>
+                <span className="num-label"> volume</span>
+              </small>
             </button>
           ))}
         </div>
@@ -208,12 +220,12 @@ export default function Home() {
             {/* Embedding panel removed: use Polymarket-provided embeddings via API if available. */}
 
             <section className="metrics-grid">
-              <Metric label="Trades" value={summary.tradeCount.toLocaleString()} />
-              <Metric label="Wallets" value={summary.walletCount.toLocaleString()} />
-              <Metric label="Total value" value={formatMoney(summary.totalValue)} />
-              <Metric label="Buy share" value={formatPercent(summary.buyShare)} />
-              <Metric label="Net pressure" value={formatMoney(summary.netPressure)} accent={summary.netPressure >= 0 ? "good" : "warn"} />
-              <Metric label="Largest trade" value={formatMoney(summary.largestTrade)} />
+              <Metric label="Trades" value={<span><span className="num">{summary.tradeCount.toLocaleString()}</span></span>} />
+              <Metric label="Wallets" value={<span><span className="num">{summary.walletCount.toLocaleString()}</span></span>} />
+              <Metric label="Total value" value={<span><span className="num">{formatMoney(summary.totalValue)}</span></span>} />
+              <Metric label="Buy share" value={<span><span className="num">{formatPercent(summary.buyShare)}</span></span>} />
+              <Metric label="Net pressure" value={<span><span className="num">{formatMoney(summary.netPressure)}</span></span>} accent={summary.netPressure >= 0 ? "good" : "warn"} />
+              <Metric label="Largest trade" value={<span><span className="num">{formatMoney(summary.largestTrade)}</span></span>} />
             </section>
 
             <section className="signal-row">
@@ -245,15 +257,15 @@ export default function Home() {
                     <tbody>
                       {trades.slice(0, 80).map((trade, index) => (
                         <tr key={`${trade.transactionHash ?? trade.id ?? trade.timestamp}-${index}`}>
-                          <td>{formatTime(trade.timestamp)}</td>
+                          <td><span className="num">{formatTime(trade.timestamp)}</span></td>
                           <td className="mono">{trade.walletHash}</td>
                           <td>
                             <span className={trade.side === "BUY" ? "pill buy" : "pill sell"}>{trade.side || "N A"}</span>
                           </td>
                           <td>{trade.outcome || "N A"}</td>
-                          <td>{trade.price.toFixed(3)}</td>
-                          <td>{trade.size.toFixed(2)}</td>
-                          <td>{formatMoney(trade.tradeValue)}</td>
+                          <td><span className="num">{trade.price.toFixed(3)}</span></td>
+                          <td><span className="num">{trade.size.toFixed(2)}</span></td>
+                          <td><span className="num">{formatMoney(trade.tradeValue)}</span></td>
                         </tr>
                       ))}
                     </tbody>
@@ -277,10 +289,12 @@ export default function Home() {
                       {wallets.slice(0, 25).map((wallet) => (
                         <tr key={wallet.walletHash}>
                           <td className="mono">{wallet.walletHash}</td>
-                          <td>{wallet.trades}</td>
-                          <td>{formatMoney(wallet.totalValue)}</td>
-                          <td className={wallet.netPressure >= 0 ? "good-text" : "warn-text"}>{formatMoney(wallet.netPressure)}</td>
-                          <td>{wallet.averagePrice.toFixed(3)}</td>
+                          <td><span className="num">{wallet.trades}</span></td>
+                          <td><span className="num">{formatMoney(wallet.totalValue)}</span></td>
+                          <td className={wallet.netPressure >= 0 ? "good-text" : "warn-text"}>
+                            <span className="num">{formatMoney(wallet.netPressure)}</span>
+                          </td>
+                          <td><span className="num">{wallet.averagePrice.toFixed(3)}</span></td>
                         </tr>
                       ))}
                     </tbody>
@@ -298,9 +312,9 @@ export default function Home() {
                   {distributions.map((dist) => (
                     <div className="dist-card" key={dist.metric}>
                       <span>{dist.metric}</span>
-                      <strong>{dist.metric === "price" ? dist.mean.toFixed(3) : formatMoney(dist.mean)}</strong>
+                      <strong><span className="num">{dist.metric === "price" ? dist.mean.toFixed(3) : formatMoney(dist.mean)}</span></strong>
                       <small>
-                        p10 {dist.p10.toFixed(3)} / p50 {dist.p50.toFixed(3)} / p90 {dist.p90.toFixed(3)}
+                        p10 <span className="num">{dist.p10.toFixed(3)}</span> / p50 <span className="num">{dist.p50.toFixed(3)}</span> / p90 <span className="num">{dist.p90.toFixed(3)}</span>
                       </small>
                     </div>
                   ))}
@@ -326,7 +340,7 @@ function Metric({
   accent,
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   accent?: "good" | "warn";
 }) {
   return (
@@ -358,7 +372,7 @@ function BarList({ rows }: { rows: { label: string; value: number }[] }) {
           <div className="bar-track">
             <div className="bar-fill" style={{ width: `${(row.value / max) * 100}%` }} />
           </div>
-          <strong>{formatMoney(row.value)}</strong>
+          <strong><span className="num">{formatMoney(row.value)}</span></strong>
         </div>
       ))}
     </div>
