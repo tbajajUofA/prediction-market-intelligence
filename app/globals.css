@@ -1,17 +1,17 @@
 :root {
-  /* Core theme tokens used throughout the dashboard. */
-  --bg: #07100d;
-  --panel: #0d1b16;
-  --panel-2: #11251f;
-  --line: #25483d;
-  --line-soft: rgba(108, 143, 129, 0.26);
-  --text: #edfdf6;
-  --muted: #98b7ab;
-  --accent: #2ee59d;
-  --accent-2: #7dd3fc;
-  --warn: #f6c453;
-  --danger: #fb7185;
-  --shadow: 0 20px 60px rgba(0, 0, 0, 0.24);
+  /* Black & white dark theme tokens */
+  --bg: #000000;
+  --panel: #080808;
+  --panel-2: #0b0b0b;
+  --line: #1a1a1a;
+  --line-soft: rgba(255, 255, 255, 0.06);
+  --text: #ffffff;
+  --muted: #bfbfbf;
+  --accent: #ffffff; /* used for highlights */
+  --accent-2: #e6e6e6;
+  --warn: #bfbfbf;
+  --danger: #ff6b6b; /* keep a single color for errors */
+  --shadow: 0 30px 80px rgba(0, 0, 0, 0.6);
 }
 
 /* Predictable sizing for all UI elements. */
@@ -57,14 +57,14 @@ button {
   height: 100vh;
   padding: 28px 22px;
   overflow: auto;
-  background: #050d0a;
+  background: var(--panel);
   border-right: 1px solid var(--line);
 }
 
 /* Small uppercase label used above major sections. */
 .eyebrow {
   margin: 0 0 8px;
-  color: var(--accent);
+  color: var(--muted);
   font-size: 0.76rem;
   font-weight: 800;
   letter-spacing: 0;
@@ -112,14 +112,14 @@ h3 {
   min-height: 42px;
   padding: 10px 12px;
   color: var(--text);
-  background: var(--panel);
+  background: #020202;
   border: 1px solid var(--line);
   border-radius: 6px;
   outline: none;
 }
 
 .field input:focus {
-  border-color: var(--accent);
+  border-color: var(--accent-2);
 }
 
 /* Checkbox/toggle rows. */
@@ -134,7 +134,7 @@ h3 {
 .check input {
   width: 16px;
   height: 16px;
-  accent-color: var(--accent);
+  accent-color: var(--accent-2);
 }
 
 /* Shared button/link button sizing. */
@@ -151,7 +151,7 @@ h3 {
 
 /* Primary action button. */
 .primary {
-  color: #03140d;
+  color: #000000;
   background: var(--accent);
 }
 
@@ -159,7 +159,7 @@ h3 {
 .secondary,
 .external {
   color: var(--text);
-  background: var(--panel-2);
+  background: transparent;
   border: 1px solid var(--line);
 }
 
@@ -204,8 +204,8 @@ h3 {
 
 /* Highlight the selected market. */
 .market-item.active {
-  background: var(--panel-2);
-  border-color: var(--accent);
+  background: #0b0b0b;
+  border-color: var(--accent-2);
 }
 
 /* Main dashboard content column. */
@@ -222,7 +222,7 @@ h3 {
 .panel,
 .metric,
 .empty {
-  background: linear-gradient(180deg, rgba(17, 37, 31, 0.96), rgba(9, 20, 16, 0.96));
+  background: linear-gradient(180deg, rgba(10,10,10,0.95), rgba(4,4,4,0.95));
   border: 1px solid var(--line);
   border-radius: 8px;
   box-shadow: var(--shadow);
@@ -261,7 +261,7 @@ h3 {
 
 /* KPI value. */
 .metric strong {
-  color: var(--accent);
+  color: var(--accent-2);
   font-size: 1.35rem;
   line-height: 1.15;
   overflow-wrap: anywhere;
@@ -302,13 +302,13 @@ h3 {
 }
 
 .confidence.high {
-  color: #03140d;
+  color: #000000;
   background: var(--accent);
 }
 
 .confidence.medium {
-  color: #130f02;
-  background: var(--warn);
+  color: var(--text);
+  background: #333333;
 }
 
 .confidence.low {
@@ -362,7 +362,7 @@ th {
   z-index: 1;
   color: var(--muted);
   text-align: left;
-  background: #0b1914;
+  background: #050505;
 }
 
 /* Wallet hash monospace text. */
@@ -383,13 +383,13 @@ th {
 }
 
 .pill.buy {
-  color: #03140d;
-  background: var(--accent);
+  color: #000000;
+  background: #ffffff;
 }
 
 .pill.sell {
-  color: #160703;
-  background: var(--warn);
+  color: #ffffff;
+  background: #000000;
 }
 
 /* Simple horizontal bar chart used for outcome flow. */
@@ -415,14 +415,14 @@ th {
 .bar-track {
   height: 12px;
   overflow: hidden;
-  background: #07100d;
+  background: #050505;
   border: 1px solid var(--line);
   border-radius: 999px;
 }
 
 .bar-fill {
   height: 100%;
-  background: linear-gradient(90deg, var(--accent), var(--accent-2));
+  background: linear-gradient(90deg, var(--accent-2), var(--accent));
 }
 
 .bar-row strong {
@@ -441,7 +441,7 @@ th {
   gap: 8px;
   min-height: 128px;
   padding: 14px;
-  background: rgba(5, 13, 10, 0.55);
+  background: rgba(255, 255, 255, 0.02);
   border: 1px solid var(--line-soft);
   border-radius: 6px;
 }
@@ -459,9 +459,9 @@ th {
 /* API error display. */
 .error {
   padding: 10px 12px;
-  color: #ffe4e8;
-  background: rgba(251, 113, 133, 0.14);
-  border: 1px solid rgba(251, 113, 133, 0.42);
+  color: var(--danger);
+  background: rgba(255, 107, 107, 0.06);
+  border: 1px solid rgba(255, 107, 107, 0.12);
   border-radius: 6px;
 }
 

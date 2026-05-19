@@ -205,6 +205,8 @@ export default function Home() {
               ) : null}
             </section>
 
+            {/* Embedding panel removed: use Polymarket-provided embeddings via API if available. */}
+
             <section className="metrics-grid">
               <Metric label="Trades" value={summary.tradeCount.toLocaleString()} />
               <Metric label="Wallets" value={summary.walletCount.toLocaleString()} />
